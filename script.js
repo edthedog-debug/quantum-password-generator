@@ -18,6 +18,7 @@ const symbolsEl = document.getElementById("symbols");
 
 lengthRange.addEventListener("input", (e) => {
     lengthVal.textContent = e.target.value;
+    generatePassword();
 });
 
 function generatePassword() {
@@ -28,7 +29,7 @@ function generatePassword() {
     if (symbolsEl.checked) validChars += charset.symbols;
 
     if (validChars === "") {
-        alert("Please select at least one character type!");
+        passwordDisplay.value = "Select at least one option!";
         return;
     }
 
@@ -46,13 +47,24 @@ function generatePassword() {
 
 generateBtn.addEventListener("click", generatePassword);
 
+// Automatic clipboard copy with anonymous security notice
 copyBtn.addEventListener("click", () => {
-    if (!passwordDisplay.value) return;
-    navigator.clipboard.writeText(passwordDisplay.value);
-    copyBtn.textContent = "Copied!";
-    setTimeout(() => {
-        copyBtn.textContent = "Copy";
-    }, 2000);
+    if (!passwordDisplay.value || passwordDisplay.value.startsWith("Select")) return;
+    
+    navigator.clipboard.writeText(passwordDisplay.value).then(() => {
+        copyBtn.textContent = "Copied! 🔒";
+        copyBtn.style.background = "#10b981"; // Green feedback
+        
+        setTimeout(() => {
+            copyBtn.textContent = "Copy";
+            copyBtn.style.background = "";
+        }, 2000);
+    });
+});
+
+// Event listeners to regenerate instantly on preference change
+[uppercaseEl, lowercaseEl, numbersEl, symbolsEl].forEach(el => {
+    el.addEventListener("change", generatePassword);
 });
 
 // Generate initial password on load
